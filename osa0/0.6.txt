@@ -1,0 +1,10 @@
+kayttaja->selain:
+note left of selain
+1. kayttaja kirjottaa jotain lomakkeeseen
+2. spa.js estää default käytöksen ja tekee lomakkeen lähetyksen POSTilla
+samalla lisäten listan loppuun juuri kirjoitetun viestin (redrawNotes)
+end note
+selain->palvelin: POST fullstack-exampleapp.herokuapp.com/new_note_spa
+note left of palvelin
+  palvelin vastaanottaa tiedot ja antaa 200 OK
+end note

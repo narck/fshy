@@ -1,0 +1,18 @@
+kayttaja->selain:
+note left of selain
+kayttaja kirjottaa jotain lomakkeeseen
+end note
+selain->palvelin: POST fullstack-exampleapp.herokuapp.com/new_note
+note left of palvelin
+  palvelin vastaanottaa tiedot ja lisää muistiinpanon listaan
+end note
+palvelin->selain: status 302, redirect Location: /notes
+
+note left of selain
+  selain saa 302 vastauksen ja Location headerin, johon se navigoi
+end note
+selain->palvelin: GET fullstack-exampleapp.herokuapp.com/notes
+
+note left of selain
+  tapahtuu sama kuin 0.3, nyt listassa on uusi elementti
+end note
