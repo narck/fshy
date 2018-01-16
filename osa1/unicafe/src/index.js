@@ -53,16 +53,16 @@ class App extends React.Component {
     c: 0,
   }
 
-  incrKey = (key) => this.setState({[key]: this.state[key] + 1 });
+  incrKey = (key) => () => this.setState({[key]: this.state[key] + 1 });
 
   render() {
     const {a,b,c} = this.state;
     return (
       <div>
         <h1>Anna palautetta</h1>
-        <Button handler={() => this.incrKey('a')}>hyvä</Button>
-        <Button handler={() => this.incrKey('b')}>neutraali</Button>
-        <Button handler={() => this.incrKey('c')}>huono</Button>
+        <Button handler={this.incrKey('a')}>hyvä</Button>
+        <Button handler={this.incrKey('b')}>neutraali</Button>
+        <Button handler={this.incrKey('c')}>huono</Button>
         <h1>Statistiikka</h1>
         <Statistics values={[a,b,c]} />
       </div>
