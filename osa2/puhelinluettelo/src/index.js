@@ -1,5 +1,6 @@
 
 import ReactDOM from 'react-dom'
+import axios from 'axios'
 
 import React from 'react';
 
@@ -28,6 +29,11 @@ class App extends React.Component {
       newNumber: '',
       searchedStr: '',
     }
+  }
+
+  componentWillMount() {
+    axios.get("http://localhost:3001/persons")
+    .then((persons) => this.setState(...this.state, {persons: persons.data}))
   }
 
   addPerson = (e) => {
