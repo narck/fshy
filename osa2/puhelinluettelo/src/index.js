@@ -3,11 +3,20 @@ import ReactDOM from 'react-dom'
 
 import React from 'react';
 
+
 const Person = ({p}) => {
   return (
     <p>{p.name}: {p.number}</p>
   )
 }
+const PersonList = ({persons}) => {
+  return (
+    <div>
+      {persons.map((p) => <Person key={p.name} p={p} />)}
+      </div>
+  )
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -16,7 +25,8 @@ class App extends React.Component {
         { name: 'Arto Hellas', number: '1234' }
       ],
       newName: '',
-      newNumber: ''
+      newNumber: '',
+      searchedStr: '',
     }
   }
 
@@ -38,16 +48,31 @@ class App extends React.Component {
   }
 
 
+
   handleNameChange = (e) => this.setState({...this.state, newName: e.target.value})
   handleNumberChange = (e) => this.setState({...this.state, newNumber: e.target.value})
+  handleSEarchChange = (e) => this.setState({...this.state, searchedStr: e.target.value})
 
 
   render() {
-    const {persons} = this.state;
+    const {persons, searchedStr} = this.state;
+
+    const filteredPersons = (searchedStr.length >= 1) ?
+                                                      persons.filter(x => x.name.toLowerCase().startsWith(searchedStr.toLowerCase())) :
+                                                      persons
 
     return (
       <div>
         <h2>Puhelinluettelo</h2>
+        <form>
+        rajaa näytettäviä: <input             value={this.state.searchedStr}
+            onChange={this.handleSEarchChange}/>
+        </form>
+
+<br/>
+<h1>Lisää uusi</h1>
+
+
         <form onSubmit={this.addPerson}>
           <div>
             nimi: <input             value={this.state.newNote}
@@ -62,7 +87,8 @@ class App extends React.Component {
           </div>
         </form>
         <h2>Numerot</h2>
-        {persons.map((p) => <Person key={p.name} p={p} />)}
+        <PersonList persons={filteredPersons} />
+
       </div>
     )
   }
