@@ -3,6 +3,16 @@ import ReactDOM from 'react-dom'
 import {all, remove, add, update} from './resource'
 import React from 'react';
 
+const Notification = ({ message,color }) => {
+  if (message === '') {
+    return null
+  }
+  return (
+    <div style={{color, border: '1px solid black'}}>
+      {message}
+    </div>
+  )
+}
 
 const Person = ({p, r}) => {
   return (
@@ -22,6 +32,8 @@ const PersonList = ({persons, removeHandler}) => {
 
 class App extends React.Component {
     state = {
+      nMessage: '',
+      nColor: '',
       persons: [],
       newName: '',
       newNumber: '',
@@ -29,14 +41,20 @@ class App extends React.Component {
     }
 
   updatePersons = (persons) => this.setState({persons})
-  removePerson = (person) => window.confirm("are u sure?") && remove(person).then(this.refresh)
+  removePerson = (person) => {
+    window.confirm("are u sure?") && remove(person).then(this.refresh).then(() => {
+      this.setState({nColor: 'red', nMessage: 'poistettiin ' + person.name})
+      this.timeNotification()
+    })
+  }
   refresh = () => all().then(this.updatePersons)
+  timeNotification = () => setTimeout(() => {
+    this.setState({nMessage: ''})
+  }, 5000)
 
   componentWillMount() {
     this.refresh()
   }
-
-
 
   addPerson = (e) => {
     e.preventDefault()
@@ -47,13 +65,24 @@ class App extends React.Component {
     const foundPerson = this.state.persons.find((x) => x.name === newPerson.name);
 
     if (foundPerson && window.confirm('already exists. wana replace?')) {
-      update({...foundPerson, number}).then(this.refresh)
+      update({...foundPerson, number})
+      .then(this.refresh)
+      .then(() =>{
+      this.setState({nColor: 'green', nMessage: 'muokattiin ' + foundPerson.name})
+      this.timeNotification()
+      })
+      .catch(() => {
+        this.setState({nColor: 'red', nMessage: 'hups! cannont find ' + foundPerson.name})
+        this.timeNotification()
+      })
     }
     else {
-
-      const persons = this.state.persons.concat(newPerson);
-
-      add(newPerson).then(this.refresh)
+      add(newPerson)
+      .then(this.refresh)
+      .then(() => {
+        this.setState({nMessage: 'lisättiin ' + newPerson.name, nColor: 'green'})
+        this.timeNotification()
+      })
     }
 
   }
@@ -71,7 +100,9 @@ class App extends React.Component {
                                                       persons
 
     return (
+
       <div>
+        <Notification color={this.state.nColor} message={this.state.nMessage}/>
         <h2>Puhelinluettelo</h2>
         <form>
         rajaa näytettäviä: <input             value={this.state.searchedStr}
