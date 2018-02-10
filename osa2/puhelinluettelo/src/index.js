@@ -1,63 +1,95 @@
 
 import ReactDOM from 'react-dom'
-import axios from 'axios'
-
+import {all, remove, add, update} from './resource'
 import React from 'react';
 
-
-const Person = ({p}) => {
+const Notification = ({ message,color }) => {
+  if (message === '') {
+    return null
+  }
   return (
-    <p>{p.name}: {p.number}</p>
+    <div style={{color, border: '1px solid black'}}>
+      {message}
+    </div>
   )
 }
-const PersonList = ({persons}) => {
+
+const Person = ({p, r}) => {
   return (
     <div>
-      {persons.map((p) => <Person key={p.name} p={p} />)}
+    <p>{p.name}: {p.number}</p>
+     <button onClick={() => r(p)}>poista</button >
+    </div>
+  )
+}
+const PersonList = ({persons, removeHandler}) => {
+  return (
+    <div>
+      {persons.map((p) => <Person key={p.id} p={p} r={removeHandler} />)}
       </div>
   )
 }
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      persons: [
-        { name: 'Arto Hellas', number: '1234' }
-      ],
+    state = {
+      nMessage: '',
+      nColor: '',
+      persons: [],
       newName: '',
       newNumber: '',
       searchedStr: '',
     }
+
+  updatePersons = (persons) => this.setState({persons})
+  removePerson = (person) => {
+    window.confirm("are u sure?") && remove(person).then(this.refresh).then(() => {
+      this.setState({nColor: 'red', nMessage: 'poistettiin ' + person.name})
+      this.timeNotification()
+    })
   }
+  refresh = () => all().then(this.updatePersons)
+  timeNotification = () => setTimeout(() => {
+    this.setState({nMessage: ''})
+  }, 5000)
 
   componentWillMount() {
-    axios.get("http://localhost:3001/persons")
-    .then((persons) => this.setState(...this.state, {persons: persons.data}))
+    this.refresh()
   }
 
   addPerson = (e) => {
-    const personExists = this.state.persons.map(x => x.name).includes(this.state.newName);
-
     e.preventDefault()
     const name = this.state.newName;
     const number = this.state.newNumber;
-    const persons = this.state.persons.concat({name, number});
+    const newPerson = {name, number};
 
-    if (personExists) {
-      alert('already exists')
+    const foundPerson = this.state.persons.find((x) => x.name === newPerson.name);
+
+    if (foundPerson && window.confirm('already exists. wana replace?')) {
+      update({...foundPerson, number})
+      .then(this.refresh)
+      .then(() =>{
+      this.setState({nColor: 'green', nMessage: 'muokattiin ' + foundPerson.name})
+      this.timeNotification()
+      })
+      .catch(() => {
+        this.setState({nColor: 'red', nMessage: 'hups! cannont find ' + foundPerson.name})
+        this.timeNotification()
+      })
     }
     else {
-      this.setState({...this.state, persons})
+      add(newPerson)
+      .then(this.refresh)
+      .then(() => {
+        this.setState({nMessage: 'lisättiin ' + newPerson.name, nColor: 'green'})
+        this.timeNotification()
+      })
     }
 
   }
 
-
-
-  handleNameChange = (e) => this.setState({...this.state, newName: e.target.value})
-  handleNumberChange = (e) => this.setState({...this.state, newNumber: e.target.value})
-  handleSEarchChange = (e) => this.setState({...this.state, searchedStr: e.target.value})
+  handleNameChange = (e) => this.setState({newName: e.target.value})
+  handleNumberChange = (e) => this.setState({newNumber: e.target.value})
+  handleSEarchChange = (e) => this.setState({searchedStr: e.target.value})
 
 
   render() {
@@ -68,7 +100,9 @@ class App extends React.Component {
                                                       persons
 
     return (
+
       <div>
+        <Notification color={this.state.nColor} message={this.state.nMessage}/>
         <h2>Puhelinluettelo</h2>
         <form>
         rajaa näytettäviä: <input             value={this.state.searchedStr}
@@ -93,7 +127,7 @@ class App extends React.Component {
           </div>
         </form>
         <h2>Numerot</h2>
-        <PersonList persons={filteredPersons} />
+        <PersonList persons={filteredPersons} removeHandler={this.removePerson} />
 
       </div>
     )
