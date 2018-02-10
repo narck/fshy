@@ -20,7 +20,9 @@ const withBody = morgan(function (tokens, req, res) {
       tokens.jbody(req, res),
     ].join(' ')
   })
+  const cors = require('cors')
 
+  app.use(cors())
 
 app.use(withBody)
 
@@ -29,7 +31,7 @@ app.use(bodyParser.json())
 const fs = require('fs')
 
 const db = JSON.parse(fs.readFileSync(DATABASE))
-let persons = db.persons
+var persons = db.persons
 
 app.get('/info', (request, response) => {
     const str = 'puhelinluettelossa ' + persons.length + ' henkilön tiedot' + '<br><br>' + new Date();
@@ -74,6 +76,7 @@ app.get('/info', (request, response) => {
 
     if (x) {
         const newp = [...persons]
+        newp.splice(i, 1)
         persons = newp
         response.status(204).end()
     }
