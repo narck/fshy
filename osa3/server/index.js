@@ -4,8 +4,6 @@ const app = express()
 const bodyParser = require('body-parser')
 
 const DATABASE = 'db.json'
-
-
 morgan.token('jbody', (req, res) => JSON.stringify(req.body))
 
 const tiny = morgan('tiny')
@@ -33,13 +31,29 @@ const fs = require('fs')
 const db = JSON.parse(fs.readFileSync(DATABASE))
 var persons = db.persons
 
+
+/*----------------------------------------------------------------*/
+/*------------------------------MONGO-----------------------------*/
+/*----------------------------------------------------------------*/
+const mongoose = require('mongoose')
+const url = 'mongodb://localhost'
+mongoose.connect(url)
+
+
+const Person = mongoose.model('Person', {
+  name: String,
+  number: String
+})
+
+
+
 app.get('/info', (request, response) => {
     const str = 'puhelinluettelossa ' + persons.length + ' henkilön tiedot' + '<br><br>' + new Date();
     response.send(str)
   })
 
   app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then((result) => response.json(result))
   })
 
   app.post('/api/persons', (request, response) => {
@@ -56,10 +70,12 @@ app.get('/info', (request, response) => {
         response.json({'error': 'number missing'})
     }
     else {
-        const newentry = n
-        n.id = Math.ceil(Math.random()*1000)
-        persons = [...persons, newentry]
-        response.json(newentry)
+        const newEntry = new Person({
+          ...n,
+          id: Math.ceil(Math.random()*1000)
+        })
+
+        newEntry.save().then(() => response.json(newEntry))
     }
   })
 
