@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api' :'http://huono.website/moro/api/'
+const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api' :'http://huono.website/moro/api/
 
 
 export const add = (person) => axios.post(baseUrl + '/persons', person)
