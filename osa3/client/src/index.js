@@ -72,7 +72,7 @@ class App extends React.Component {
       this.timeNotification()
       })
       .catch(() => {
-        this.setState({nColor: 'red', nMessage: 'hups! cannont find ' + foundPerson.name})
+        this.setState({nColor: 'red', nMessage: 'person exists already: ' + foundPerson.name})
         this.timeNotification()
       })
     }
