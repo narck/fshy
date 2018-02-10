@@ -63,8 +63,10 @@ class App extends React.Component {
     const newPerson = {name, number};
 
     const foundPerson = this.state.persons.find((x) => x.name === newPerson.name);
-
-    if (foundPerson && window.confirm('already exists. wana replace?')) {
+    if (!name || !number) {
+      this.setState({nColor: 'red', nMessage: 'anna nimi ja numero'})
+    }
+    else if (foundPerson && window.confirm('already exists. wana replace?')) {
       update({...foundPerson, number})
       .then(this.refresh)
       .then(() =>{
