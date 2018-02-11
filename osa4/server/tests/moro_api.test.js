@@ -10,6 +10,12 @@ const Blog = require('../blog')
 //   likes: Number
 // })
 
+beforeAll(async () => {
+  await Blog.remove({})
+})
+
+
+
 test('get works', async () => {
   await api
     .get('/api/blogs')
@@ -20,12 +26,10 @@ test('get works', async () => {
 test('post works', async () => {
   const moro = {author: 'keijo', title: ' Keijos blogi', url: 'keijo.fi', likes: 159130}
   await api
-    .post('/api/blogs', moro)
+    .post('/api/blogs')
+    .send(moro)
     .expect(201)
     .expect('Content-Type', /application\/json/)
-    const all = await api.get('/api/blogs')
-    console.log(all.body)
-
 })
 
 
@@ -33,10 +37,12 @@ test('post without likes works', async () => {
   const moro = {author: 'keijo', title: ' Keijos blogi', url: 'keijo.vif'}
   await api.post('/api/blogs', moro)
   const all = await api.get('/api/blogs')
-  console.log(all)
 
 })
 
-afterAll(() => {
-  Blog.remove({}, () => server.close())
+afterAll(async () => {
+  await Blog.remove({})
+  server.close()
 })
+
+
