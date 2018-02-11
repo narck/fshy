@@ -39,6 +39,21 @@ test('post works', async () => {
     expect((x+1)).toBe(y)
 })
 
+
+test('delete works', async () => {
+  await moroHelper.runFixture()
+  const x = await moroHelper.someBlog()
+
+
+  const response = await api.delete('/api/blogs/'+x._id)
+  .expect(201)
+  .expect('Content-Type', /application\/json/)
+
+  const real = await moroHelper.blogExists(x)
+  expect(real).toBe(false)
+})
+
+
 test('post without likes works', async () => {
   const moro = {author: 'keijo', title: ' Keijos blogi', url: 'keijo.vif'}
   const response = await api.post('/api/blogs').send(moro)

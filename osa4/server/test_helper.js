@@ -17,4 +17,13 @@ const totalBlogs = async () => {
     const t  =await Blog.find({})
     return t.length
 }
-module.exports = {runFixture, totalBlogs}
+
+const someBlog = async () => {
+    return await Blog.findOne({})
+}
+
+const blogExists = async (x) => {
+    const lol = await Blog.findOne(x)
+    return Object.keys(lol).length === 0
+}
+module.exports = {runFixture, totalBlogs, someBlog, blogExists}

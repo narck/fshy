@@ -23,4 +23,13 @@ moroRouter.get('/', async (request, response) => {
     }
   })
 
+  moroRouter.delete('/:id', async (request, response) => {
+    try {
+      const b = Blog.remove({_id: request.params.id})
+      response.status(201).json('okk')
+    } catch (e) {
+      response.status(500).json({ error: 'hups' })
+    }
+  })
+
 module.exports = moroRouter
