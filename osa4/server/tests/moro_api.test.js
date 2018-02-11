@@ -18,10 +18,15 @@ test('get works', async () => {
     .expect('Content-Type', /application\/json/)
 
     expect(listHelper.totalLikes(response.body)).toBe(105)
+
+    const x = await moroHelper.totalBlogs()
+    expect(response.body.length).toBe(x)
 })
 
 test('post works', async () => {
   const moro = {author: 'keijo', title: ' Keijos blogi', url: 'keijo.fi', likes: 159130}
+  const x = await moroHelper.totalBlogs()
+
   const response = await api
     .post('/api/blogs')
     .send(moro)
@@ -29,6 +34,9 @@ test('post works', async () => {
     .expect('Content-Type', /application\/json/)
 
     expect(response.body.author).toBe('keijo')
+    const y = await moroHelper.totalBlogs()
+
+    expect((x+1)).toBe(y)
 })
 
 test('post without likes works', async () => {

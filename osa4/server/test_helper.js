@@ -13,4 +13,8 @@ const runFixture = async () => {
     }
 }
 
-module.exports = {runFixture}
+const totalBlogs = async () => {
+    const t  =await Blog.find({})
+    return t.length
+}
+module.exports = {runFixture, totalBlogs}
