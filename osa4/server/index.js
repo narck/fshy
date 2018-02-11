@@ -3,7 +3,6 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const Blog = require('./blog')
 const moroRouter = require('./moro')
 
 app.use('/api/blogs', moroRouter)
