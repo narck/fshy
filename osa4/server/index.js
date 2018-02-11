@@ -7,9 +7,9 @@ const moroRouter = require('./moro')
 const mongoose = require('mongoose')
 const middleware = require('./middjleware')
 
-app.use('/api/blogs', moroRouter)
 app.use(cors())
 app.use(bodyParser.json())
+app.use('/api/blogs', moroRouter)
 app.use(middleware.error)
 app.use(middleware.logger)
 
