@@ -2,42 +2,51 @@ const supertest = require('supertest')
 const { app, server } = require('../index')
 const api = supertest(app)
 const Blog = require('../blog')
-
-// const Blog = mongoose.model('Blog', {
-//   title: String,
-//   author: String,
-//   url: String,
-//   likes: Number
-// })
+const moroHelper = require('../test_helper')
+const listHelper = require('../list_helper')
 
 beforeAll(async () => {
   await Blog.remove({})
 })
 
-
-
 test('get works', async () => {
-  await api
+  await moroHelper.runFixture()
+
+  const response = await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
+
+    expect(listHelper.totalLikes(response.body)).toBe(105)
 })
 
 test('post works', async () => {
   const moro = {author: 'keijo', title: ' Keijos blogi', url: 'keijo.fi', likes: 159130}
-  await api
+  const response = await api
     .post('/api/blogs')
     .send(moro)
     .expect(201)
     .expect('Content-Type', /application\/json/)
-})
 
+    expect(response.body.author).toBe('keijo')
+})
 
 test('post without likes works', async () => {
   const moro = {author: 'keijo', title: ' Keijos blogi', url: 'keijo.vif'}
-  await api.post('/api/blogs', moro)
-  const all = await api.get('/api/blogs')
+  const response = await api.post('/api/blogs').send(moro)
+  expect(response.body.likes).toBe(0)
+})
 
+test('post without required fields fails', async () => {
+  const moro = {author: 'keijo', title: ' Keijos blogi'}
+  const moro2 = {author: 'keijo', url: 'keijo.vif'}
+  const moro3 = {title: ' Keijos blogi', url: 'keijo.vif'}
+  const moro4 = {}
+
+  await api.post('/api/blogs').send(moro).expect(400)
+  await api.post('/api/blogs').send(moro2).expect(400)
+  await api.post('/api/blogs').send(moro3).expect(400)
+  await api.post('/api/blogs').send(moro4).expect(400)
 })
 
 afterAll(async () => {
