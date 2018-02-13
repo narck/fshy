@@ -1,6 +1,8 @@
+const jwt = require('jsonwebtoken')
+
 const moroRouter = require('express').Router()
 const Blog = require('./blog')
-
+const currentUser = require('./authlol')
 const User = require('./user')
 
 moroRouter.get('/', async (request, response) => {
@@ -11,7 +13,11 @@ moroRouter.get('/', async (request, response) => {
     try {
       let blog = new Blog(request.body)
       const fields = [blog.title, blog.author, blog.url]
-      const user = await User.findOne({})
+
+      const {id, username} = jwt.verify(request.token, process.env.SECRET)
+
+      const user = await User.findOne({_id: id})
+
       blog.user = user._id
 
       if (fields.some(x => x === undefined)) return response.status(400).json({ error: 'field missing' })
@@ -24,7 +30,13 @@ moroRouter.get('/', async (request, response) => {
 
       response.status(201).json(b)
     } catch (e) {
-      response.status(500).json({ error: 'hups' })
+      console.log(e.name)
+      if (e.name === 'JsonWebTokenError' ) {
+        response.status(401).json({ error: e.message })
+      } else {
+        console.log(e)
+        response.status(500).json({ error: 'something went wrong...' })
+      }
     }
   })
 

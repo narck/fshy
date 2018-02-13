@@ -4,16 +4,23 @@ const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const moroRouter = require('./moro')
+const loginRouter = require('./login')
 const userRouter = require('./userrouter')
 const mongoose = require('mongoose')
 const middleware = require('./middjleware')
 
+
+process.env.SECRET = 'tosi hyvä secret'
+
 app.use(cors())
 app.use(bodyParser.json())
+
+app.use(middleware.tokenExtractor)
+
 app.use('/api/blogs', moroRouter)
 app.use('/api/users', userRouter)
-app.use(middleware.error)
-app.use(middleware.logger)
+app.use('/api/login', loginRouter)
+
 
 const mongoUrl = process.env.NODE_ENV === 'test' ? 'mongodb://localhost/bloglisttest': 'mongodb://localhost/bloglist'
 
