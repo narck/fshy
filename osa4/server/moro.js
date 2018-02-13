@@ -30,11 +30,10 @@ moroRouter.get('/', async (request, response) => {
 
       response.status(201).json(b)
     } catch (e) {
-      console.log(e.name)
+
       if (e.name === 'JsonWebTokenError' ) {
         response.status(401).json({ error: e.message })
       } else {
-        console.log(e)
         response.status(500).json({ error: 'something went wrong...' })
       }
     }
@@ -42,9 +41,19 @@ moroRouter.get('/', async (request, response) => {
 
   moroRouter.delete('/:id', async (request, response) => {
     try {
-      const b = await Blog.findOneAndRemove({_id: request.params.id})
-      response.status(201).json('okk')
+      const {id, username} = jwt.verify(request.token, process.env.SECRET)
+      const b = await Blog.findOne({_id: request.params.id})
+
+      if (b.user.toString() !== id.toString()) {
+        response.status(403).end()
+        return
+      }
+
+      const bx = await Blog.findOneAndRemove({_id: request.params.id})
+
+      response.status(201).json('ok')
     } catch (e) {
+
       response.status(500).json({ error: 'hups' })
     }
   })
