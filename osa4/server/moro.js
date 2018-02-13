@@ -2,11 +2,7 @@ const moroRouter = require('express').Router()
 const Blog = require('./blog')
 
 moroRouter.get('/', async (request, response) => {
-    Blog
-      .find({})
-      .then(blogs => {
-        response.json(blogs)
-      })
+    response.json(await Blog.find({}))
   })
 
   moroRouter.post('/', async (request, response) => {
@@ -25,9 +21,23 @@ moroRouter.get('/', async (request, response) => {
 
   moroRouter.delete('/:id', async (request, response) => {
     try {
-      const b = Blog.remove({_id: request.params.id})
+      const b = await Blog.findOneAndRemove({_id: request.params.id})
       response.status(201).json('okk')
     } catch (e) {
+      response.status(500).json({ error: 'hups' })
+    }
+  })
+
+
+  moroRouter.put('/:id', async (request, response) => {
+    try {
+      const a = {title, url ,author} = request.body
+      if (title === undefined || url === undefined || author === undefined) response.status(400).end()
+
+      const b = await Blog.findByIdAndUpdate(request.params.id, a)
+      response.status(201).json(b)
+    } catch (e) {
+      console.log(e)
       response.status(500).json({ error: 'hups' })
     }
   })

@@ -60,6 +60,18 @@ test('post without likes works', async () => {
   expect(response.body.likes).toBe(0)
 })
 
+test('put works', async () => {
+  await moroHelper.runFixture()
+  const x = await moroHelper.someBlog()
+
+  const newParams = {title: 'tere', author:'moro123', url:'veeveevee.kummit.vi', likes:52885198952918925}
+  const response = await api.put('/api/blogs/'+x._id).send(newParams).expect(201).expect('Content-Type', /application\/json/)
+
+  const edited  = await Blog.findOne({_id: x._id})
+
+  expect(edited.author).toBe('moro123')
+})
+
 test('post without required fields fails', async () => {
   const moro = {author: 'keijo', title: ' Keijos blogi'}
   const moro2 = {author: 'keijo', url: 'keijo.vif'}
